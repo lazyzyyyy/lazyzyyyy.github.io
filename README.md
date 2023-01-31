@@ -1,0 +1,1 @@
+# lazyzyyyy.github.io
