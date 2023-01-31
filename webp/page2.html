@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* define the style for the image container */
+    #image-container {
+      width: 32px;
+      height: 32px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 50px auto;
+    }
+    
+    /* define the style for each layer image */
+    #layer1, #layer2, #layer3 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 200%;
+    }
+    
+    /* Add styles for the buttons */
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 20px;
+      background-color: fuchsia;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- define the image container and three image elements, each with an ID corresponding to one of the layers -->
+  <div id="image-container">
+    <img id="layer1" src="">
+    <img id="layer2" src="">
+    <img id="layer3" src="">
+  </div>
+  <!-- define buttons to generate the image and download it -->
+  <button id="generateButton" onclick="generateImage()">Generate Image</button>
+  <button id="downloadButton" onclick="downloadImage()">Download Image</button>
+
+  <script>
+    // define arrays to store the files for each layer
+    const layer1Files = ['f0.png', 'f1.png', 'f2.png', 'f3.png', 'f4.png', 'f5.png', 'f6.png', 'f7.png', 'f8.png', 'f9.png'];
+    const layer2Files = ['v0.png', 'v1.png', 'v2.png', 'v3.png', 'v4.png', 'v5.png', 'v6.png', 'v7.png', 'v8.png', 'v9.png'];
+    const layer3Files = ['g0.png', 'g1.png', 'g2.png', 'g3.png', 'g4.png', 'g5.png', 'g6.png', 'g7.png', 'g8.png', 'g9.png'];
+    
+    // define separate weight arrays for each layer
+    const layer1Weights = [1, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1];
+    const layer2Weights = [0.1, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1];
+    const layer3Weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+    
+    // function to generate an image file for a layer
+    function generateLayerImage(layerFiles, weights) {
+      // generate a random index based on the weights
+      const index = weightedRandom(weights);
+      // return the file at the generated index
+      return layerFiles[index];
+    }
+    
+    // function to generate a random index based on the weights
+    function weightedRandom(weights) {
+      // calculate the sum of all weights
+      let sum = 0;
+      for (let i = 0; i < weights.length; i++) {
+        sum += weights[i];
+      }
+      // generate a random value between 0 and the sum of weights
+      const randomValue = Math.random() * sum;
+      // loop through the weights and compare the random value to the sum so far
+      let sumSoFar = 0;
+      for (let i = 0; i < weights.length; i++) {
+        sumSoFar += weights[i];
+        if (randomValue <= sumSoFar) {
+          // return the index if the random value is less than or equal to the sum so far
+          return i;
+        }
+      }
+      // return the last index if the random value is greater than the sum
+      return weights.length - 1;
+    }
+
+    // function to generate the image
+    function generateImage() {
+  // generate a random file for each layer
+  const layer1 = generateLayerImage(layer1Files, layer1Weights);
+  const layer2 = generateLayerImage(layer2Files, layer2Weights);
+  const layer3 = generateLayerImage(layer3Files, layer3Weights);
+  // set the src attribute of each image element to the generated file
+  document.getElementById("layer1").src = layer1;
+  document.getElementById("layer2").src = layer2;
+  document.getElementById("layer3").src = layer3;
+
+  // Create a canvas to store the image
+  var canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  var context = canvas.getContext('2d');
+
+  // Draw the images onto the canvas
+  var layer1Image = new Image();
+  layer1Image.src = layer1;
+  layer1Image.onload = function() {
+    context.drawImage(layer1Image, 0, 0);
+
+    var layer2Image = new Image();
+    layer2Image.src = layer2;
+    layer2Image.onload = function() {
+      context.drawImage(layer2Image, 0, 0);
+
+      var layer3Image = new Image();
+      layer3Image.src = layer3;
+      layer3Image.onload = function() {
+        context.drawImage(layer3Image, 0, 0);
+      };
+    };
+  };
+}
+    // func
+    function downloadImage() {
+    // get the canvas element
+    const canvas = document.createElement("canvas");
+    // generate the name of the image based on the layers composing it
+    const layer1Name = document.getElementById("layer1").src.split("/").pop().split(".")[0];
+    const layer2Name = document.getElementById("layer2").src.split("/").pop().split(".")[0];
+    const layer3Name = document.getElementById("layer3").src.split("/").pop().split(".")[0];
+    const imageName = `${layer1Name}_${layer2Name}_${layer3Name}.png`;
+    canvas.width = 32;
+    canvas.height = 32;
+
+    // get the image elements
+    const layer1 = document.getElementById("layer1");
+    const layer2 = document.getElementById("layer2");
+    const layer3 = document.getElementById("layer3");
+
+    // get the context from the canvas element
+    const ctx = canvas.getContext("2d");
+
+    // draw each layer on the canvas
+    ctx.drawImage(layer1, 0, 0);
+    ctx.drawImage(layer2, 0, 0);
+    ctx.drawImage(layer3, 0, 0);
+
+    // create a link element to download the image
+    const link = document.createElement("a");
+    link.download = imageName;
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+</script>
+</body>
+</html>
